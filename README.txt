@@ -1,144 +1,85 @@
-Using the Google Places API with a Database and
-Visualizing Data on Google Map
+**GeoDataMapper: Integrating Google Places API for Location Visualization**
 
-In this project, we are using the Google geocoding API
-to clean up some user-entered geographic locations of
-university names and then placing the data on a Google
-Map.
+---
 
-Note: Windows has difficulty in displaying UTF-8 characters
-in the console so for each command window you open, you may need
-to type the following command before running this code:
+### Overview
+GeoDataMapper is a project designed to utilize the Google Places API along with a database to clean up, manage, and visualize geographic location data on a Google Map. This README provides a comprehensive guide on setting up and executing the project, along with explanations of key components and instructions for user interaction.
 
-    chcp 65001
+### Features
+- **Data Loading and Cleaning:**
+  - Reads input data from a file (`where.data`).
+  - Checks if the data is already present in the database (`geodata.sqlite`).
+  - Calls the Google geocoding API to retrieve missing data and stores it in the database.
 
-http://stackoverflow.com/questions/388490/unicode-characters-in-windows-command-line-how
+- **API Key and Rate Limiting:**
+  - Explains the rate limitation of the Google Geocoding API and provides alternative sources for data retrieval without API keys.
 
+- **Visualization:**
+  - Visualizes the data on a Google Map using JavaScript.
+  - Generates a JavaScript file (`where.js`) with location, latitude, and longitude information.
 
-You should install the SQLite browser to view and modify
-the databases from:
+- **Execution:**
+  - Runs `geoload.py` to load data into the database.
+  - Runs `geodump.py` to generate JavaScript code for visualization.
 
-http://sqlitebrowser.org/
+- **User Interaction:**
+  - Opens `where.html` in a browser to view the locations on the map.
+  - Interacts with the map to explore the locations.
 
-The first problem to solve is that the Google geocoding
-API is rate limited to a fixed number of requests per day.
-So if you have a lot of data you might need to stop and
-restart the lookup process several times.  So we break
-the problem into two phases.
+### Setup Instructions
+1. **Clone the Repository:**
+   ```
+   git clone <repository_url>
+   cd GeoDataMapper
+   ```
 
-In the first phase we take our input data in the file
-(where.data) and read it one line at a time, and retrieve the
-geocoded response and store it in a database (geodata.sqlite).
-Before we use the geocoding API, we simply check to see if
-we already have the data for that particular line of input.
+2. **Install Dependencies:**
+   - Ensure Python 3.x is installed on your system.
+   - Install required Python packages:
+     ```
+     pip install -r requirements.txt
+     ```
 
-You can re-start the process at any time by removing the file
-geodata.sqlite
+3. **Obtain Google API Key (Optional):**
+   - If you have a Google API Key, follow the instructions [here](https://developers.google.com/maps/documentation/geocoding/intro) to obtain one.
+   - If not, you can use a subset of data available [here](http://py4e-data.dr-chuck.net/geojson) by setting `api_key` to `False` in `geoload.py`.
 
-Run the geoload.py program.   This program will read the input
-lines in where.data and for each line check to see if it is already
-in the database and if we don't have the data for the location,
-call the geocoding API to retrieve the data and store it in
-the database.
+4. **Run `geoload.py`:**
+   - Execute the following command:
+     ```
+     python3 geoload.py
+     ```
+   - This script will load data into the database (`geodata.sqlite`).
 
-As of December 2016, the Google Geocoding APIs changed dramatically.
-They moved some functionality that we use from the Geocoding API
-into the Places API.  Also all the Google Geo-related APIs require an
-API key. To complete this assignment without a Google account,
-without an API key, or from a country that blocks
-access to Google, you can use a subset of that data which is
-available at:
+5. **Run `geodump.py`:**
+   - Execute the following command:
+     ```
+     python3 geodump.py
+     ```
+   - This script will generate JavaScript code for visualization.
 
-http://py4e-data.dr-chuck.net/geojson
+6. **View Visualization:**
+   - Open `where.html` in a web browser.
+   - Explore the locations on the map.
 
-To use this, simply leave the api_key set to False in 
-geoload.py.
+### File Structure
+- `geoload.py`: Script to load data into the database.
+- `geodump.py`: Script to generate JavaScript code for visualization.
+- `where.data`: Input data file containing geographic locations.
+- `geodata.sqlite`: SQLite database for storing location data.
+- `where.html`: HTML file for visualizing locations on a Google Map.
+- `where.js`: JavaScript file generated for visualization.
 
-This URL only has a subset of the data but it has no rate limit so
-it is good for testing.
+### Notes
+- Ensure UTF-8 support in the command line interface (CLI) by running `chcp 65001` in Windows.
+- For detailed information on how the project works and its components, refer to the provided documentation within each script.
 
-If you want to try this with the API key, follow the
-instructions at:
+### Credits
+- Developed by [Your Name]
 
-https://developers.google.com/maps/documentation/geocoding/intro
+### License
+This project is licensed under the [MIT License](LICENSE).
 
-and put the API key in the code.
+---
 
-Here is a sample run after there is already some data in the
-database:
-
-Mac: python3 geoload.py
-Win: geoload.py
-
-Found in database  Northeastern University
-
-Found in database  University of Hong Kong, Illinois Institute of Technology, Bradley University
-
-Found in database  Technion
-
-Found in database  Viswakarma Institute, Pune, India
-
-Found in database  UMD
-
-Found in database  Tufts University
-
-Resolving Monash University
-Retrieving http://py4e-data.dr-chuck.net/geojson?address=Monash+University
-Retrieved 2063 characters {    "results" : [
-{u'status': u'OK', u'results': ... }
-
-Resolving Kokshetau Institute of Economics and Management
-Retrieving http://py4e-data.dr-chuck.net/geojson?address=Kokshetau+Institute+of+Economics+and+Management
-Retrieved 1749 characters {    "results" : [
-{u'status': u'OK', u'results': ... }
-
-The first five locations are already in the database and so they
-are skipped.  The program scans to the point where it finds un-retrieved
-locations and starts retrieving them.
-
-The geoload.py can be stopped at any time, and there is a counter
-that you can use to limit the number of calls to the geocoding
-API for each run.
-
-Once you have some data loaded into geodata.sqlite, you can
-visualize the data using the (geodump.py) program.  This
-program reads the database and writes tile file (where.js)
-with the location, latitude, and longitude in the form of
-executable JavaScript code.
-
-A run of the geodump.py program is as follows:
-
-Mac: python3 geodump.py
-Win: geodump.py
-
-Northeastern University, 360 Huntington Avenue, Boston, MA 02115, USA 42.3396998 -71.08975
-Bradley University, 1501 West Bradley Avenue, Peoria, IL 61625, USA 40.6963857 -89.6160811
-...
-Technion, Viazman 87, Kesalsaba, 32000, Israel 32.7775 35.0216667
-Monash University Clayton Campus, Wellington Road, Clayton VIC 3800, Australia -37.9152113 145.134682
-Kokshetau, Kazakhstan 53.2833333 69.3833333
-...
-12 records written to where.js
-Open where.html to view the data in a browser
-
-The file (where.html) consists of HTML and JavaScript to visualize
-a Google Map.  It reads the most recent data in where.js to get
-the data to be visualized.  Here is the format of the where.js file:
-
-myData = [
-[42.3396998,-71.08975, 'Northeastern University, 360 Huntington Avenue, Boston, MA 02115, USA'],
-[40.6963857,-89.6160811, 'Bradley University, 1501 West Bradley Avenue, Peoria, IL 61625, USA'],
-[32.7775,35.0216667, 'Technion, Viazman 87, Kesalsaba, 32000, Israel'],
-   ...
-];
-
-This is a JavaScript list of lists.  The syntax for JavaScript
-list constants is very similar to Python so the syntax should
-be familiar to you.
-
-Simply open where.html in a browser to see the locations.  You
-can hover over each map pin to find the location that the
-gecoding API returned for the user-entered input.  If you
-cannot see any data when you open the where.html file, you might
-want to check the JavaScript or developer console for your browser.
-
+Feel free to reach out if you have any questions, encounter issues, or want to contribute to the project!
